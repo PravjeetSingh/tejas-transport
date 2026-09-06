@@ -138,18 +138,28 @@ function Footer() {
 
 
         {/* BOTTOM */}
-        <div className="footer-bottom">
+<div className="footer-bottom">
 
-          <span>
-            © {new Date().getFullYear()} Tejas Transport.
-            All Rights Reserved.
-          </span>
+  <span>
+    © {new Date().getFullYear()} Tejas Transport.
+    All Rights Reserved.
+  </span>
 
-          <span>
-            Container Transportation & Logistics
-          </span>
+<span>
+  For Support:{" "}
+  <a
+    href="mailto:singhpravjeet263@gmail.com"
+    className="support-email"
+  >
+    singhpravjeet263@gmail.com
+  </a>
+</span>
 
-        </div>
+  <span>
+    Container Transportation & Logistics
+  </span>
+
+</div>
 
       </div>
 

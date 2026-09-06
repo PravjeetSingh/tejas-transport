@@ -5944,3 +5944,16 @@ main {
   }
 
 }
+
+.support-email {
+  color: #e53935;
+  font-weight: 500;
+  font-size: 15px;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.support-email:hover {
+  color: #ff6b6b;
+  text-decoration: underline;
+}

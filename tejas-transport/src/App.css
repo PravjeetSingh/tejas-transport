@@ -182,3 +182,15 @@
     border-right-color: var(--border);
   }
 }
+
+.support-email {
+  color: #e53935;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.support-email:hover {
+  color: #ff6b6b;
+  text-decoration: underline;
+}
