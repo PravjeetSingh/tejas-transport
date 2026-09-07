@@ -183,14 +183,16 @@
   }
 }
 
-.support-email {
+
+
+.form-error {
+  margin: 10px 0;
   color: #e53935;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.3s ease;
+  font-size: 14px;
+  font-weight: 500;
 }
 
-.support-email:hover {
-  color: #ff6b6b;
-  text-decoration: underline;
+.form-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }

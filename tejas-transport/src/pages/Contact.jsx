@@ -1,5 +1,3 @@
-import emailjs from "@emailjs/browser";
-
 import { useState } from "react";
 import {
   FiPhone,
@@ -11,36 +9,70 @@ import {
 } from "react-icons/fi";
 
 function Contact() {
-const [submitted, setSubmitted] = useState(false);
-const [sending, setSending] = useState(false);
-const [error, setError] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  setSending(true);
-  setError("");
+    setSending(true);
+    setError("");
 
-  try {
-    await emailjs.sendForm(
-      "YOUR_SERVICE_ID....dalo",
-      "YOUR_TEMPLATE_ID...dalo",
-      e.currentTarget,
-      {
-        publicKey: "YOUR_PUBLIC_KEY...dalo",
+    const formData = new FormData(e.target);
+
+    const data = {
+      name: formData.get("name"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      pickup: formData.get("pickup"),
+      delivery: formData.get("delivery"),
+      container: formData.get("container"),
+      message: formData.get("message"),
+    };
+
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const rawText = await response.text();
+      let result = {};
+
+      if (rawText) {
+        try {
+          result = JSON.parse(rawText);
+        } catch {
+          throw new Error(
+            rawText.slice(0, 180) ||
+              "Unable to send enquiry. Please try again."
+          );
+        }
       }
-    );
 
-    setSubmitted(true);
-  } catch (err) {
-    console.error("Email sending failed:", err);
-    setError(
-      "Unable to send your enquiry right now. Please call us directly."
-    );
-  } finally {
-    setSending(false);
-  }
-};
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || "Failed to send enquiry."
+        );
+      }
+
+      setSubmitted(true);
+      e.target.reset();
+    } catch (err) {
+      console.error(err);
+
+      setError(
+        err.message ||
+        "Unable to send enquiry. Please try again."
+      );
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <main>
@@ -48,7 +80,6 @@ const handleSubmit = async (e) => {
       {/* HERO */}
       <section className="page-hero contact-hero">
         <div className="container">
-
           <span>CONTACT US</span>
 
           <h1>
@@ -61,7 +92,6 @@ const handleSubmit = async (e) => {
             Have a transportation requirement?
             Get in touch with Tejas Transport.
           </p>
-
         </div>
       </section>
 
@@ -92,7 +122,10 @@ const handleSubmit = async (e) => {
 
             <div className="contact-details">
 
-              <a href="tel:+919725105062" className="contact-detail">
+              <a
+                href="tel:+919725105062"
+                className="contact-detail"
+              >
                 <div className="contact-icon">
                   <FiPhone />
                 </div>
@@ -104,7 +137,10 @@ const handleSubmit = async (e) => {
               </a>
 
 
-              <a href="tel:+918178600098" className="contact-detail">
+              <a
+                href="tel:+918178600098"
+                className="contact-detail"
+              >
                 <div className="contact-icon">
                   <FiPhone />
                 </div>
@@ -126,7 +162,9 @@ const handleSubmit = async (e) => {
 
                 <div>
                   <span>EMAIL</span>
-                  <strong>sujit@tejcontainercare.in</strong>
+                  <strong>
+                    sujit@tejcontainercare.in
+                  </strong>
                 </div>
               </a>
 
@@ -170,19 +208,19 @@ const handleSubmit = async (e) => {
 
                 <FiCheckCircle />
 
-                <h3>
-                  Thank You!
-                </h3>
+                <h3>Thank You!</h3>
 
                 <p>
-                  Your enquiry has been recorded on this
-                  frontend demo. Our team can contact you
-                  directly using the details provided.
+                  Your enquiry has been sent successfully.
+                  Our team will contact you soon.
                 </p>
 
                 <button
                   type="button"
-                  onClick={() => setSubmitted(false)}
+                  onClick={() => {
+                    setSubmitted(false);
+                    setError("");
+                  }}
                   className="form-reset"
                 >
                   Submit Another Enquiry
@@ -204,16 +242,19 @@ const handleSubmit = async (e) => {
 
                     <input
                       type="text"
+                      name="name"
                       placeholder="Enter your name"
                       required
                     />
                   </div>
+
 
                   <div className="form-group">
                     <label>PHONE NUMBER</label>
 
                     <input
                       type="tel"
+                      name="phone"
                       placeholder="+91"
                       required
                     />
@@ -227,6 +268,7 @@ const handleSubmit = async (e) => {
 
                   <input
                     type="email"
+                    name="email"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -239,16 +281,19 @@ const handleSubmit = async (e) => {
 
                     <input
                       type="text"
+                      name="pickup"
                       placeholder="Pickup location"
                       required
                     />
                   </div>
+
 
                   <div className="form-group">
                     <label>DELIVERY LOCATION</label>
 
                     <input
                       type="text"
+                      name="delivery"
                       placeholder="Delivery location"
                       required
                     />
@@ -260,7 +305,10 @@ const handleSubmit = async (e) => {
                 <div className="form-group">
                   <label>CONTAINER REQUIREMENT</label>
 
-                  <select defaultValue="">
+                  <select
+                    name="container"
+                    defaultValue=""
+                  >
                     <option value="" disabled>
                       Select container type
                     </option>
@@ -288,26 +336,32 @@ const handleSubmit = async (e) => {
                   <label>MESSAGE</label>
 
                   <textarea
+                    name="message"
                     rows="5"
                     placeholder="Tell us about your transportation requirement"
-                  ></textarea>
+                  />
                 </div>
 
-{error && (
-  <p className="form-error">
-    {error}
-  </p>
-)}
+
+                {error && (
+                  <p className="form-error">
+                    {error}
+                  </p>
+                )}
 
 
-<button
-  type="submit"
-  className="btn btn-primary form-submit"
-  disabled={sending}
->
-  {sending ? "Sending..." : "Send Enquiry"}
-  {!sending && <FiArrowRight />}
-</button>
+                <button
+                  type="submit"
+                  className="btn btn-primary form-submit"
+                  disabled={sending}
+                >
+                  {sending
+                    ? "Sending..."
+                    : "Send Enquiry"
+                  }
+
+                  {!sending && <FiArrowRight />}
+                </button>
 
               </form>
 
@@ -330,7 +384,10 @@ const handleSubmit = async (e) => {
 
             <div>
               <strong>Transportation Support</strong>
-              <span>Discuss your container movement requirement</span>
+
+              <span>
+                Discuss your container movement requirement
+              </span>
             </div>
           </div>
 
@@ -353,7 +410,9 @@ const handleSubmit = async (e) => {
 
             <div>
               <strong>Send An Email</strong>
-              <span>sujit@tejcontainercare.in</span>
+              <span>
+                sujit@tejcontainercare.in
+              </span>
             </div>
 
           </a>
